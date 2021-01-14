@@ -10,7 +10,7 @@ using LyokoAPI.VirtualStructures.Interfaces;
 
 namespace LyokoStatsPlugin
 {
-    public class StatsLogger : LAPIListener
+    public class StatsListener : LAPIListener
     {
         public PluginConfig PluginConfig;
 

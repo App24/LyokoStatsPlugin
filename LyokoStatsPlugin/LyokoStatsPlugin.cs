@@ -15,17 +15,33 @@ namespace LyokoStatsPlugin
         public static string PluginName => "StatsPlugin";
 
         public override string Author => "App24";
-        public override LVersion Version => "1.0.0";
+        public override LVersion Version => "1.1.0";
         public override List<LVersion> CompatibleLAPIVersions => new List<LVersion>() { "2.0.0" };
 
-        StatsLogger statsLogger = new StatsLogger();
+        StatsListener statsLogger = new StatsListener();
+
+        StatsCommandListener statsCommandListener = new StatsCommandListener();
 
         LVersion ConfigVersion = "1.0.0";
 
         SimpleHTTPServer myServer;
 
+        static LyokoStatsPlugin plugin;
+
+        public static void DisablePlugin()
+        {
+            plugin.Disable();
+        }
+
+        public static void EnablePlugin()
+        {
+            plugin.Enable();
+        }
+
         protected override bool OnEnable()
         {
+            if(plugin==null)
+            plugin = this;
             if (ConfigManager.GetMainConfig().HasSetting("version"))
             {
                 if(LVersion.TryParse(ConfigManager.GetMainConfig().GetSetting("version"), out var newVersion)){
@@ -49,6 +65,10 @@ namespace LyokoStatsPlugin
 
             statsLogger.PluginConfig = ConfigManager.GetMainConfig();
             statsLogger.StartListening();
+
+            statsCommandListener.AddCommand(new Commands.SetPort().SetPluginConfig(ConfigManager.GetMainConfig()));
+            statsCommandListener.StartListening();
+
             int port = -1;
             if (ConfigManager.GetMainConfig().HasSetting("serverPort"))
             {
@@ -71,13 +91,14 @@ namespace LyokoStatsPlugin
             myServer.PluginConfig = ConfigManager.GetMainConfig();
             LyokoLogger.Log(Name, $"StatsPlugin Web server started in port {myServer.Port}, goto http://localhost:{myServer.Port} to access it");
             if(port==-1)
-            LyokoLogger.Log(Name, "You can set a custom port for the server by going to the config file and putting \"serverPort: *any value*\" as a new line");
+            LyokoLogger.Log(Name, "You can set a custom port for the server by doing api.stats.setport.*number*");
             return true;
         }
 
         protected override bool OnDisable()
         {
             statsLogger.StopListening();
+            statsCommandListener.StopListening();
             ConfigManager.SaveAllConfigs();
             myServer.Stop();
             return true;

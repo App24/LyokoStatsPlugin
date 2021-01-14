@@ -20,6 +20,14 @@ namespace LyokoStatsPlugin
             return defaultValue;
         }
 
+        public static void RemoveSetting(this PluginConfig config, string key)
+        {
+            if (config.HasSetting(key))
+            {
+                config.Values.Remove(key);
+            }
+        }
+
         public static bool HasSetting(this PluginConfig config, string key)
         {
             return config.GetSetting(key) != null;
