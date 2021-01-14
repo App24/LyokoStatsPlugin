@@ -15,7 +15,7 @@ namespace LyokoStatsPlugin
         public static string PluginName => "StatsPlugin";
 
         public override string Author => "App24";
-        public override LVersion Version => "1.1.0";
+        public override LVersion Version => "1.1.1";
         public override List<LVersion> CompatibleLAPIVersions => new List<LVersion>() { "2.0.0" };
 
         StatsListener statsLogger = new StatsListener();
